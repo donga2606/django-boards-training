@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Board Topics{% endblock %}
+{% load humanize %}
+{% block breadcrumb %}
+    <li class="breadcrumb-item active"><a href="{% url 'home' %}">Boards</a></li>
+    <li class="breadcrumb-item active">{{ board.name }}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+        <a href="{% url 'new_topic' board.pk %}" class="btn btn-primary">New topic</a>
+    </div>
+      <table class="table mb-4 table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Topic</th>
+                <th>Starter</th>
+                <th>Replies</th>
+                <th>Views</th>
+                <th>Last update</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for topic in topics %}
+            <tr>
+                <td class="align-middle">
+                    <p class="mb-0">
+                    <a href="{% url 'topic_posts' board.pk topic.pk %}">{{ topic.subject }}</a>
+                    </p>
+                    <small class="text-muted">
+                        Pages:
+                        {% for i in topic.get_page_range %}
+                            <a href="{% url 'topic_posts' board.pk topic.pk %}?page={{ i }}">{{ i }}</a>
+                        {% endfor %}
+                        {% if topic.has_many_pages %}
+                            ... <a href="{% url 'topic_posts' board.pk topic.pk %}?page={{ topic.get_page_count }}">Last Page</a>
+                        {% endif %}
+                    </small>
+                </td>
+                <td class="align-middle">{{ topic.starter.username }}</td>
+                <td class="align-middle">{{ topic.replies }}</td>
+                <td class="align-middle">{{ topic.views }}</td>
+                <td class="align-middle">{{ topic.last_update|naturaltime }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% include 'include/pagination.html' %}
+{% endblock %}
